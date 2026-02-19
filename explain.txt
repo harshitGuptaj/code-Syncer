@@ -1,0 +1,467 @@
+====================================
+  CODE SYNC - PROJECT EXPLANATION
+====================================
+
+WHAT IS CODE SYNC?
+------------------
+Code Sync is a real-time collaborative code editor. Multiple users can join
+a room using a unique Room ID and code together simultaneously. Changes made
+by one user are instantly visible to all others in the same room.
+
+
+HOW IT WORKS
+------------
+The project has two main parts:
+
+1. CLIENT (Frontend) - Built with React + TypeScript
+   - Runs on: http://localhost:5173
+   - What it does: Provides the user interface for coding and managing files.
+
+2. SERVER (Backend) - Built with Node.js + Express + Socket.io
+   - Runs on: http://localhost:3000
+   - What it does: Handles real-time communication between users using
+     WebSockets (Socket.io). It syncs code and file changes across all
+     connected users.
+
+
+USER FLOW
+---------
+1. User opens the app → sees the Home Page with a join form
+2. User enters a Room ID and Username → clicks "Join"
+3. Server creates/joins the room → redirects user to the Editor Page
+4. Multiple users can join the same room using the same Room ID
+5. All changes (code, files) sync in real-time
+
+
+ACTIVE PROJECT STRUCTURE
+------------------------
+Code-Sync-main/
+├── client/                  → Frontend (React App)
+│   ├── src/
+│   │   ├── api/             → API calls (code execution)
+│   │   ├── assets/          → Images, logos, SVGs
+│   │   ├── components/      → UI Components
+│   │   ├── context/         → React Context (global state)
+│   │   ├── hooks/           → Custom React hooks
+│   │   ├── pages/           → Pages (Home, Editor)
+│   │   ├── resources/       → Themes, fonts config
+│   │   ├── styles/          → CSS files
+│   │   ├── types/           → TypeScript type definitions
+│   │   ├── utils/           → Utility functions
+│   │   ├── App.tsx          → Main app with routing
+│   │   └── main.tsx         → Entry point
+│   └── index.html           → HTML entry file
+│
+├── server/                  → Backend (Node.js)
+│   └── src/
+│       └── server.ts        → Main server file
+│
+└── .vscode/                 → VS Code settings
+
+
+ACTIVE FEATURES
+---------------
+1. REAL-TIME CODE EDITING
+   - Uses CodeMirror as the code editor
+   - Code changes sync instantly via Socket.io
+   - Supports syntax highlighting for many languages
+   - Shows cursor positions of other users
+
+2. FILE MANAGEMENT
+   - Create, rename, delete files and folders
+   - File structure syncs across all users
+   - Download entire codebase as a ZIP file
+
+3. CODE EXECUTION
+   - Run code directly in the browser
+   - Uses Piston API for execution
+
+4. USER MANAGEMENT
+   - See online/offline users in the room
+   - User join/leave notifications
+
+5. SETTINGS
+   - Change editor theme, font, language
+
+
+========================================================================
+  DETAILED CODE EXPLANATION - WHAT EACH FILE DOES
+========================================================================
+
+
+---------- ENTRY POINT ----------
+
+FILE: client/src/main.tsx
+WHAT IT DOES: Starting point of the entire app
+HOW IT WORKS:
+  - Imports the <App /> component
+  - Wraps it inside <AppProvider> (which gives global state to all components)
+  - Renders everything into the HTML element with id="root"
+  - Loads global.css for styling
+CONNECTS TO: App.tsx, AppProvider.tsx, global.css
+
+
+---------- MAIN APP ----------
+
+FILE: client/src/App.tsx
+WHAT IT DOES: Sets up page routing (which URL shows which page)
+HOW IT WORKS:
+  - Uses React Router to define 2 routes:
+    "/" (root)              → shows HomePage (join room form)
+    "/editor/:roomId"      → shows EditorPage (code editor)
+  - Also renders <Toast /> for popup notifications
+CONNECTS TO: HomePage.tsx, EditorPage.tsx, Toast.tsx
+
+
+---------- PAGES ----------
+
+FILE: client/src/pages/HomePage.tsx
+WHAT IT DOES: The landing page where users join a room
+HOW IT WORKS:
+  - Shows an illustration image on the left side
+  - Shows the join form (FormComponent) on the right side
+  - Has a green gradient background with dark card container
+CONNECTS TO: FormComponent.tsx, illustration.svg
+
+FILE: client/src/pages/EditorPage.tsx
+WHAT IT DOES: The main coding page after joining a room
+HOW IT WORKS:
+  - Checks if user has a valid username, if not redirects to home
+  - Uses useUserActivity() hook to track online/offline status
+  - Uses useFullScreen() hook for fullscreen mode
+  - Renders <Sidebar /> and <WorkSpace /> inside a split view
+  - If connection fails, shows <ConnectionStatusPage />
+CONNECTS TO: Sidebar.tsx, WorkSpace/index.tsx, SplitterComponent.tsx
+
+
+---------- COMPONENTS ----------
+
+FILE: client/src/components/forms/FormComponent.tsx
+WHAT IT DOES: The join room form with Room ID and Username inputs
+HOW IT WORKS:
+  - Has 2 input fields: Room ID and Username
+  - "Join" button emits "join-request" event to server via socket
+  - "Generate Unique Room Id" button creates a random UUID
+  - Validates: username min 3 chars, room ID min 5 chars
+  - After server accepts, navigates to /editor/:roomId
+CONNECTS TO: AppContext (user state), SocketContext (socket connection)
+
+FILE: client/src/components/workspace/index.tsx
+WHAT IT DOES: The main workspace area showing the code editor
+HOW IT WORKS:
+  - Takes the full remaining screen space
+  - Renders <EditorComponent /> (CodeMirror editor)
+  - Uses useResponsive() hook for dynamic height
+CONNECTS TO: EditorComponent.tsx
+
+FILE: client/src/components/sidebar/Sidebar.tsx
+WHAT IT DOES: Left sidebar with navigation buttons
+HOW IT WORKS:
+  - Shows icon buttons for: Files, Run, Users, Settings
+  - Clicking a button opens that view in the sidebar panel
+  - Clicking the same button again closes the sidebar
+  - Uses responsive classes (bottom bar on mobile, left bar on desktop)
+CONNECTS TO: SidebarButton.tsx, ViewContext
+
+FILE: client/src/components/sidebar/sidebar-views/SidebarButton.tsx
+WHAT IT DOES: Individual sidebar icon button
+HOW IT WORKS:
+  - Receives a view name and icon as props
+  - On click: opens/closes the corresponding sidebar view
+  - Shows a tooltip on hover with the view name
+CONNECTS TO: ViewContext
+
+FILE: client/src/components/SplitterComponent.tsx
+WHAT IT DOES: Creates a resizable split pane
+HOW IT WORKS:
+  - Uses react-split library
+  - Splits the screen between Sidebar (left) and Workspace (right)
+  - User can drag the divider to resize
+CONNECTS TO: Sidebar.tsx, WorkSpace/index.tsx
+
+
+---------- SIDEBAR VIEWS ----------
+
+FILE: client/src/components/sidebar/sidebar-views/FilesView.tsx
+WHAT IT DOES: File explorer panel
+HOW IT WORKS:
+  - Shows tree view of all files and folders
+  - Right-click context menu for create/rename/delete
+  - Click a file to open it in the editor
+  - "Download All" button to save as ZIP
+  - Syncs file operations to all users via socket
+CONNECTS TO: FileContext, SocketContext
+
+FILE: client/src/components/sidebar/sidebar-views/RunView.tsx
+WHAT IT DOES: Code execution panel
+HOW IT WORKS:
+  - Shows "Run" button to execute current code
+  - Has input field for program input (stdin)
+  - Shows output/errors in output area
+  - Uses Piston API to execute code on server
+CONNECTS TO: RunCodeContext, pistonApi.ts
+
+FILE: client/src/components/sidebar/sidebar-views/UsersView.tsx
+WHAT IT DOES: Shows list of users in the room
+HOW IT WORKS:
+  - Displays avatar and username for each user
+  - Shows online (green) or offline (gray) status
+  - Updates in real-time when users join/leave
+CONNECTS TO: AppContext (users list)
+
+FILE: client/src/components/sidebar/sidebar-views/SettingsView.tsx
+WHAT IT DOES: Editor settings panel
+HOW IT WORKS:
+  - Dropdown to change font family
+  - Dropdown to change font size (12-24)
+  - Dropdown to change color theme
+  - Dropdown to change programming language
+  - "Reset to default" button
+  - Settings save to localStorage
+CONNECTS TO: SettingContext
+
+
+---------- CONTEXT (GLOBAL STATE) ----------
+
+FILE: client/src/context/AppProvider.tsx
+WHAT IT DOES: Wraps the entire app with all context providers
+HOW IT WORKS:
+  - Nests providers in this order:
+    AppContext → SocketProvider → SettingContext → ViewContext →
+    FileContext → RunCodeContext
+  - This means any component can access any of these states
+CONNECTS TO: All context files
+
+FILE: client/src/context/AppContext.tsx
+WHAT IT DOES: Stores the main app-wide state
+WHAT IT STORES:
+  - users[]         → list of all users in the room
+  - currentUser     → current user's username and roomId
+  - status          → connection status (INITIAL, JOINED, etc.)
+  - activityState   → CODING or DRAWING mode
+CONNECTS TO: Used by almost every component
+
+FILE: client/src/context/SocketContext.tsx
+WHAT IT DOES: Creates and manages the WebSocket connection
+HOW IT WORKS:
+  - Connects to backend URL (VITE_BACKEND_URL or localhost:3000)
+  - Listens for events: join-accepted, user-disconnected, errors
+  - Handles: connection errors, username conflicts
+  - Provides the socket object to all components
+CONNECTS TO: server/src/server.ts (via WebSocket)
+
+FILE: client/src/context/FileContext.tsx
+WHAT IT DOES: Manages all file/folder operations
+WHAT IT STORES:
+  - fileStructure   → tree of all files and folders
+  - openFiles[]     → list of currently open files in tabs
+  - activeFile      → the file currently being edited
+HOW IT WORKS:
+  - createFile(), renameFile(), deleteFile()
+  - createDirectory(), renameDirectory(), deleteDirectory()
+  - Each operation emits socket event to sync with other users
+  - Listens for remote file changes from other users
+CONNECTS TO: SocketContext, AppContext
+
+FILE: client/src/context/SettingContext.tsx
+WHAT IT DOES: Manages user preferences
+WHAT IT STORES:
+  - theme      → editor color theme (default: "Dracula")
+  - language   → programming language (default: "Javascript")
+  - fontSize   → editor font size (default: 16)
+  - fontFamily → editor font (default: "Space Mono")
+HOW IT WORKS:
+  - Loads saved settings from localStorage on start
+  - Saves to localStorage whenever settings change
+  - resetSettings() restores all defaults
+CONNECTS TO: SettingsView.tsx, localStorage
+
+FILE: client/src/context/ViewContext.tsx
+WHAT IT DOES: Controls which sidebar view is active
+WHAT IT STORES:
+  - activeView      → currently selected view (FILES, RUN, etc.)
+  - isSidebarOpen   → whether sidebar panel is visible
+  - viewComponents  → maps view names to React components
+  - viewIcons       → maps view names to icons
+CONNECTS TO: Sidebar.tsx, SidebarButton.tsx
+
+FILE: client/src/context/RunCodeContext.tsx
+WHAT IT DOES: Manages code execution state
+WHAT IT STORES:
+  - input    → user input for the program (stdin)
+  - output   → execution output/result
+  - isRunning → whether code is currently executing
+HOW IT WORKS:
+  - Sends code + language to Piston API
+  - Receives output and displays in RunView
+CONNECTS TO: RunView.tsx, pistonApi.ts
+
+
+---------- HOOKS ----------
+
+FILE: client/src/hooks/useLocalStorage.tsx
+WHAT IT DOES: Helper to read/write localStorage
+PROVIDES: getItem(key), setItem(key, value), removeItem(key)
+
+FILE: client/src/hooks/useResponsive.tsx
+WHAT IT DOES: Calculates dynamic heights for responsive layout
+PROVIDES: viewHeight, minHeightReached
+
+FILE: client/src/hooks/useWindowDimensions.tsx
+WHAT IT DOES: Tracks browser window width and height
+PROVIDES: width, height, isMobile (true if width < 768)
+
+FILE: client/src/hooks/useFullScreen.tsx
+WHAT IT DOES: Enables fullscreen mode on the editor page
+
+FILE: client/src/hooks/useUserActivity.tsx
+WHAT IT DOES: Detects if user is active or idle
+HOW IT WORKS:
+  - Listens for mouse/keyboard events
+  - Emits USER_ONLINE when user is active
+  - Emits USER_OFFLINE when user is idle
+
+FILE: client/src/hooks/usePageEvents.tsx
+WHAT IT DOES: Handles browser tab close/refresh events
+HOW IT WORKS:
+  - Shows confirmation dialog when user tries to close the page
+
+FILE: client/src/hooks/useContextMenu.tsx
+WHAT IT DOES: Custom right-click context menu for file explorer
+
+
+---------- APIS ----------
+
+FILE: client/src/api/pistonApi.ts
+WHAT IT DOES: Calls the Piston API to execute code
+HOW IT WORKS:
+  - Sends POST request with code, language, and version
+  - Piston API runs the code on their server
+  - Returns stdout (output) and stderr (errors)
+  - API URL: https://emkc.org/api/v2/piston/execute
+
+FILE: client/src/api/pollinationsApi.ts
+WHAT IT DOES: Calls Pollinations AI for code generation (currently disabled)
+
+
+---------- UTILS ----------
+
+FILE: client/src/utils/file.ts
+WHAT IT DOES: Helper functions for file operations
+PROVIDES: getId() for generating unique IDs, file tree helpers
+
+FILE: client/src/utils/getIconClassName.ts
+WHAT IT DOES: Maps file extensions to VS Code-style file icons
+
+FILE: client/src/utils/formateDate.ts
+WHAT IT DOES: Formats timestamps for chat messages
+
+FILE: client/src/utils/customMapping.ts
+WHAT IT DOES: Custom file extension to language mappings
+
+
+---------- RESOURCES ----------
+
+FILE: client/src/resources/Themes.ts
+WHAT IT DOES: Lists all available editor color themes
+INCLUDES: Dracula, GitHub Dark/Light, Material, Nord, etc.
+
+FILE: client/src/resources/Fonts.ts
+WHAT IT DOES: Lists all available editor fonts
+INCLUDES: Space Mono, Fira Code, JetBrains Mono, etc.
+
+
+---------- TYPES ----------
+
+FILE: client/src/types/app.ts
+WHAT IT DOES: TypeScript types for app state (ACTIVITY_STATE, DrawingData)
+
+FILE: client/src/types/user.ts
+WHAT IT DOES: TypeScript types for User, RemoteUser, USER_STATUS
+
+FILE: client/src/types/socket.ts
+WHAT IT DOES: TypeScript types for socket events (SocketEvent enum)
+
+FILE: client/src/types/view.ts
+WHAT IT DOES: TypeScript types for sidebar views (VIEWS enum)
+
+FILE: client/src/types/file.ts
+WHAT IT DOES: TypeScript types for file/folder structure
+
+FILE: client/src/types/chat.ts
+WHAT IT DOES: TypeScript types for chat messages (currently disabled)
+
+FILE: client/src/types/copilot.ts
+WHAT IT DOES: TypeScript types for AI copilot (currently disabled)
+
+
+---------- STYLES ----------
+
+FILE: client/src/styles/global.css
+WHAT IT DOES: Global CSS styles for the entire app
+INCLUDES:
+  - Tailwind CSS directives (@tailwind base, components, utilities)
+  - Custom scrollbar styling
+  - CodeMirror editor styling
+  - Bounce animation for illustration
+  - Mobile responsive styles
+
+
+---------- SERVER ----------
+
+FILE: server/src/server.ts
+WHAT IT DOES: The entire backend server
+HOW IT WORKS:
+  - Creates Express server with CORS enabled
+  - Creates Socket.io server for real-time communication
+  - Maintains userSocketMap[] array (all connected users)
+  
+  HELPER FUNCTIONS:
+  - getUsersInRoom(roomId)      → returns all users in a room
+  - getRoomId(socketId)         → finds room ID by socket ID
+  - getUserBySocketId(socketId) → finds user by socket ID
+  
+  SOCKET EVENT HANDLERS:
+  - JOIN_REQUEST        → Validates username, adds user to room
+  - disconnecting       → Removes user, notifies others
+  - FILE_CREATED        → Broadcasts new file to room
+  - FILE_UPDATED        → Broadcasts code changes to room
+  - FILE_RENAMED        → Broadcasts file rename to room
+  - FILE_DELETED        → Broadcasts file deletion to room
+  - DIRECTORY_CREATED   → Broadcasts new folder to room
+  - DIRECTORY_UPDATED   → Broadcasts folder changes to room
+  - DIRECTORY_RENAMED   → Broadcasts folder rename to room
+  - DIRECTORY_DELETED   → Broadcasts folder deletion to room
+  - SEND_MESSAGE        → Broadcasts chat message to room
+  - TYPING_START        → Broadcasts typing status with cursor position
+  - TYPING_PAUSE        → Broadcasts typing stopped
+  - CURSOR_MOVE         → Broadcasts cursor position change
+  - USER_ONLINE         → Broadcasts user came back online
+  - USER_OFFLINE        → Broadcasts user went offline
+  - REQUEST_DRAWING     → Requests drawing data from other users
+  - SYNC_DRAWING        → Sends drawing data to requesting user
+  - DRAWING_UPDATE      → Broadcasts drawing changes to room
+
+CONNECTS TO: All frontend socket events via Socket.io
+
+
+========================================================================
+  HOW TO RUN
+========================================================================
+
+1. Open terminal in "server" folder:
+   npm install
+   npm run dev
+
+2. Open another terminal in "client" folder:
+   npm install
+   npm run dev
+
+3. Open browser: http://localhost:5173
+
+
+TECH STACK
+----------
+Frontend:  React, TypeScript, Tailwind CSS, CodeMirror
+Backend:   Node.js, Express, Socket.io
+APIs:      Piston (code execution)

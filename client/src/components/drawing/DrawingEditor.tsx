@@ -9,14 +9,15 @@ function DrawingEditor() {
     const { isMobile } = useWindowDimensions()
 
     return (
-        <Tldraw
-            inferDarkMode
-            forceMobile={isMobile}
-            defaultName="Editor"
-            className="z-0"
-        >
-            <ReachEditor />
-        </Tldraw>
+        <div className="h-full w-full" style={{ height: "100vh" }}>
+            <Tldraw
+                inferDarkMode
+                forceMobile={isMobile}
+                defaultName="Editor"
+            >
+                <ReachEditor />
+            </Tldraw>
+        </div>
     )
 }
 
@@ -28,15 +29,12 @@ function ReachEditor() {
     const handleChangeEvent = useCallback(
         (change: HistoryEntry<TLRecord>) => {
             const snapshot = change.changes
-            // Update the drawing data in the context
             setDrawingData(editor.store.getSnapshot())
-            // Emit the snapshot to the server
             socket.emit(SocketEvent.DRAWING_UPDATE, { snapshot })
         },
         [editor.store, setDrawingData, socket],
     )
 
-    // Handle drawing updates from other clients
     const handleRemoteDrawing = useCallback(
         ({ snapshot }: { snapshot: RecordsDiff<TLRecord> }) => {
             editor.store.mergeRemoteChanges(() => {
@@ -59,7 +57,6 @@ function ReachEditor() {
     )
 
     useEffect(() => {
-        // Load the drawing data from the context
         if (drawingData && Object.keys(drawingData).length > 0) {
             editor.store.loadSnapshot(drawingData)
         }
@@ -70,10 +67,8 @@ function ReachEditor() {
             source: "user",
             scope: "document",
         })
-        // Listen for drawing updates from other clients
         socket.on(SocketEvent.DRAWING_UPDATE, handleRemoteDrawing)
 
-        // Cleanup
         return () => {
             cleanupFunction()
             socket.off(SocketEvent.DRAWING_UPDATE)

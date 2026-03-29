@@ -2,6 +2,7 @@ import SplitterComponent from "@/components/SplitterComponent"
 import ConnectionStatusPage from "@/components/connection/ConnectionStatusPage"
 import Sidebar from "@/components/sidebar/Sidebar"
 import WorkSpace from "@/components/workspace"
+import DrawingEditor from "@/components/drawing/DrawingEditor"
 import { useAppContext } from "@/context/AppContext"
 import { useSocket } from "@/context/SocketContext"
 import useFullScreen from "@/hooks/useFullScreen"
@@ -10,6 +11,7 @@ import { SocketEvent } from "@/types/socket"
 import { USER_STATUS, User } from "@/types/user"
 import { useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { ACTIVITY_STATE } from "@/types/app"
 
 function EditorPage() {
     // Listen user online/offline status
@@ -18,7 +20,7 @@ function EditorPage() {
     useFullScreen()
     const navigate = useNavigate()
     const { roomId } = useParams()
-    const { status, setCurrentUser, currentUser } = useAppContext()
+    const { status, setCurrentUser, currentUser, activityState } = useAppContext()
     const { socket } = useSocket()
     const location = useLocation()
 
@@ -50,7 +52,11 @@ function EditorPage() {
     return (
         <SplitterComponent>
             <Sidebar />
-            <WorkSpace/>
+            {activityState === ACTIVITY_STATE.DRAWING ? (
+                <DrawingEditor />
+            ) : (
+                <WorkSpace />
+            )}
         </SplitterComponent>
     )
 }

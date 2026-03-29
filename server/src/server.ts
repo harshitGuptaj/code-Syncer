@@ -6,6 +6,7 @@ import { SocketEvent, SocketId } from "./types/socket"
 import { USER_CONNECTION_STATUS, User } from "./types/user"
 import { Server } from "socket.io"
 import path from "path"
+import axios from "axios"
 
 dotenv.config()
 
@@ -16,6 +17,38 @@ app.use(express.json())
 app.use(cors())
 
 app.use(express.static(path.join(__dirname, "public"))) // Serve static files
+
+const PISTON_API_URL = process.env.PISTON_API_URL || "https://emkc.org/api/v2/piston"
+
+app.get("/api/runtimes", async (req: Request, res: Response) => {
+    try {
+        const response = await axios.get(`${PISTON_API_URL}/runtimes`)
+        res.json(response.data)
+    } catch (error: any) {
+        console.error("Error fetching runtimes:", error.message)
+        res.status(500).json({ error: "Failed to fetch runtimes" })
+    }
+})
+
+app.post("/api/execute", async (req: Request, res: Response) => {
+    try {
+        const { language, version, files, stdin } = req.body
+        console.log("Executing code:", { language, version, files: files?.length, stdin })
+        const response = await axios.post(`${PISTON_API_URL}/execute`, {
+            language,
+            version,
+            files,
+            stdin,
+        })
+        res.json(response.data)
+    } catch (error: any) {
+        console.error("Error executing code:", error.message)
+        console.error("Full error:", error)
+        console.error("Piston API response:", error.response?.data)
+        console.error("Piston API status:", error.response?.status)
+        res.status(500).json({ error: "Failed to execute code", details: error.response?.data })
+    }
+})
 
 const server = http.createServer(app)
 const io = new Server(server, {
@@ -292,6 +325,6 @@ app.get("/", (req: Request, res: Response) => {
 	res.sendFile(path.join(__dirname, "..", "public", "index.html"))
 })
 
-server.listen(PORT, () => {
+server.listen(Number(PORT), () => {
 	console.log(`Listening on port ${PORT}`)
 })

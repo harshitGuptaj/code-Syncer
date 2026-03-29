@@ -32,6 +32,18 @@ function Sidebar() {
                     icon={viewIcons[VIEWS.RUN]}
                 />
                 <SidebarButton
+                    viewName={VIEWS.CHATS}
+                    icon={viewIcons[VIEWS.CHATS]}
+                />
+                <SidebarButton
+                    viewName={VIEWS.COPILOT}
+                    icon={viewIcons[VIEWS.COPILOT]}
+                />
+                <SidebarButton
+                    viewName={VIEWS.DRAWING}
+                    icon={viewIcons[VIEWS.DRAWING]}
+                />
+                <SidebarButton
                     viewName={VIEWS.CLIENTS}
                     icon={viewIcons[VIEWS.CLIENTS]}
                 />

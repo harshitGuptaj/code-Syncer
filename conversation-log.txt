@@ -1,0 +1,87 @@
+CODE SYNC PROJECT - CONVERSATION LOG
+====================================
+Date: March 26, 2026
+Project: C:\Users\bhara\Desktop\Code-Sync-main
+
+================================================================================
+TOPIC 1: LOGO SVG ADDED TO LOGIN PAGE
+================================================================================
+
+Task: Added logo.svg to the Code Sync project login page.
+
+File: C:\Users\bhara\Desktop\Code-Sync-main\client\src\assets\logo.svg
+- Created the SVG file with the logo content provided by user
+
+The login page (FormComponent.tsx) already had the logo import and display code:
+- Line 9: import logo from "@/assets/logo.svg"
+- Line 93: <img src={logo} alt="Logo" className="w-full max-w-[550px] h-auto mb-2"/>
+
+Status: COMPLETED - Logo now displays on login page.
+
+================================================================================
+TOPIC 2: COPILOT AND CODE EXECUTION NOT WORKING
+================================================================================
+
+Issues Reported:
+1. Copilot (AI Code Generation) - Not working
+2. Run Code (Code Execution) - Not working
+
+Investigation Results:
+- Copilot uses: https://text.pollinations.ai (free service, should work)
+- Run Code uses: Piston API via VITE_PISTON_API_URL
+
+Error encountered:
+- "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+- The public Piston API (emkc.org) now requires authentication
+
+SOLUTION PROVIDED:
+
+Option A: Self-host Piston API (RECOMMENDED)
+-------------------------------------------
+1. Install Docker Desktop from https://docker.com
+2. Run this command in PowerShell:
+   docker run -d -p 2000:2000 ghcr.io/marketplace-sync/piston:latest
+3. Update client/.env:
+   VITE_BACKEND_URL=http://localhost:3000
+   VITE_PISTON_API_URL=http://localhost:2000/api/v2
+4. Restart dev server: cd client && npm run dev
+
+Option B: Use Judge0 RapidAPI
+-------------------------------------------
+1. Create account at https://rapidapi.com
+2. Subscribe to Judge0 API (free tier)
+3. Update .env with RapidAPI credentials
+4. Requires code changes to add API key
+
+Current .env file (client/.env):
+---------------------------------
+VITE_BACKEND_URL=http://localhost:3000
+VITE_PISTON_API_URL=https://emkc.org/api/v2/piston
+
+STATUS: USER NEEDS TO INSTALL DOCKER AND RUN PISTON CONTAINER
+
+================================================================================
+FILES REFERENCE
+================================================================================
+
+Project Structure:
+- Client: C:\Users\bhara\Desktop\Code-Sync-main\client
+- Server: C:\Users\bhara\Desktop\Code-Sync-main\server
+- Logo: C:\Users\bhara\Desktop\Code-Sync-main\client\src\assets\logo.svg
+- Login Form: C:\Users\bhara\Desktop\Code-Sync-main\client\src\components\forms\FormComponent.tsx
+- Run Code Context: C:\Users\bhara\Desktop\Code-Sync-main\client\src\context\RunCodeContext.tsx
+- Copilot Context: C:\Users\bhara\Desktop\Code-Sync-main\client\src\context\CopilotContext.tsx
+- Piston API: C:\Users\bhara\Desktop\Code-Sync-main\client\src\api\pistonApi.ts
+- Pollinations API: C:\Users\bhara\Desktop\Code-Sync-main\client\src\api\pollinationsApi.ts
+
+================================================================================
+NEXT STEPS (TO BE COMPLETED BY USER)
+================================================================================
+
+1. Install Docker Desktop from https://docker.com
+2. Run Piston container:
+   docker run -d -p 2000:2000 ghcr.io/marketplace-sync/piston:latest
+3. Update client/.env with new Piston URL
+4. Restart the client dev server
+
+================================================================================

@@ -38,8 +38,10 @@ const RunCodeContextProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const fetchSupportedLanguages = async () => {
             try {
-                const languages = await axiosInstance.get("/runtimes")
-                setSupportedLanguages(languages.data)
+                const response = await axiosInstance.get("/runtimes")
+                const data = response.data
+                const languages = Array.isArray(data) ? data : (data.runtimes || [])
+                setSupportedLanguages(languages)
             } catch (error: any) {
                 toast.error("Failed to fetch supported languages")
                 if (error?.response?.data) console.error(error?.response?.data)
@@ -49,16 +51,15 @@ const RunCodeContextProvider = ({ children }: { children: ReactNode }) => {
         fetchSupportedLanguages()
     }, [])
 
-    // Set the selected language based on the file extension
     useEffect(() => {
-        if (supportedLanguages.length === 0 || !activeFile?.name) return
+        if (!supportedLanguages?.length || !activeFile?.name) return
 
         const extension = activeFile.name.split(".").pop()
         if (extension) {
             const languageName = langMap.languages(extension)
             const language = supportedLanguages.find(
-                (lang) =>
-                    lang.aliases.includes(extension) ||
+                (lang: Language) =>
+                    lang.aliases?.includes(extension) ||
                     languageName.includes(lang.language.toLowerCase()),
             )
             if (language) setSelectedLanguage(language)
@@ -92,8 +93,8 @@ const RunCodeContextProvider = ({ children }: { children: ReactNode }) => {
             setIsRunning(false)
             toast.dismiss()
         } catch (error: any) {
-            console.error(error.response.data)
-            console.error(error.response.data.error)
+            console.error("Error response:", error.response?.data)
+            console.error("Error detail:", error.response?.data?.error)
             setIsRunning(false)
             toast.dismiss()
             toast.error("Failed to run the code")

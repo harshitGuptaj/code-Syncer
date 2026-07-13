@@ -12,7 +12,7 @@
 
 A powerful, real-time collaborative coding platform built for pair programming, code reviews, and team collaboration. Join any room with a unique Room ID and see changes instantly synced across all participants.
 
-[Live Demo](https://code-syncer.vercel.app) | [Report Bug](https://github.com/harshitGuptaj/code-Syncer/issues) | [Request Feature](https://github.com/harshitGuptaj/code-Syncer/issues)
+[Live Demo](https://code-syncer.vercel.app) | [Interactive Demo Page](demo.html) | [Report Bug](https://github.com/harshitGuptaj/code-Syncer/issues)
 
 </div>
 
@@ -22,29 +22,49 @@ A powerful, real-time collaborative coding platform built for pair programming, 
 
 > **Try it now:** [https://code-syncer.vercel.app](https://code-syncer.vercel.app)
 
-![Code Sync Preview](preview.png)
+### Watch the Demo
 
-### How It Works
+[![Code Sync Demo](https://img.shields.io/badge/Watch-Interactive%20Demo-E94560?style=for-the-badge&logo=github)](demo.html)
 
-1. **Create a Room** - Enter your name and click "Create Room" to get a unique Room ID
-2. **Share the ID** - Send the Room ID to your collaborators
-3. **Start Coding** - Everyone in the room sees changes in real-time
-4. **Collaborate** - Use the AI Copilot, chat, drawing board, and code execution
+### How to Use the Demo
+
+**Step 1: Open the App**
+- Visit [https://code-syncer.vercel.app](https://code-syncer.vercel.app)
+
+**Step 2: Create a Room**
+- Enter your name (e.g., "Alice")
+- Click **"Generate Unique Room Id"** or enter a custom Room ID
+- Click **"Join"**
+
+**Step 3: Share the Room**
+- Copy the Room ID from the URL
+- Share it with your collaborators
+- They can join using the same Room ID
+
+**Step 4: Start Collaborating**
+- Edit code in real-time
+- Use the sidebar for file management
+- Chat with your team
+- Draw on the whiteboard
+- Execute code in 25+ languages
+- Get AI-powered code suggestions
 
 ---
 
 ## Features
 
-- **Real-Time Code Syncing** - Instant synchronization of code changes across all participants using WebSockets
-- **Multi-Language Support** - Execute code in 20+ programming languages including JavaScript, Python, Java, C++, Go, Rust, and more
-- **AI Code Copilot** - Get AI-powered code suggestions and generation powered by Groq API
-- **Collaborative Drawing** - Built-in whiteboard with tldraw for brainstorming and visual collaboration
-- **In-Room Chat** - Real-time messaging system for team communication
-- **File Management** - Create, rename, delete, and organize files and directories
-- **Syntax Highlighting** - Beautiful code editing with CodeMirror and multiple theme support
-- **User Presence** - See who's online, cursor positions, and typing indicators
-- **Responsive Design** - Works seamlessly on desktop and tablet devices
-- **Dark Theme** - Beautiful dark UI designed for extended coding sessions
+| Feature | Description |
+|---------|-------------|
+| **Real-Time Code Syncing** | Instant synchronization of code changes across all participants using WebSockets |
+| **Multi-Language Support** | Execute code in 25+ programming languages including JavaScript, Python, Java, C++, Go, Rust |
+| **AI Code Copilot** | Get AI-powered code suggestions and generation powered by Groq API |
+| **Collaborative Drawing** | Built-in whiteboard with tldraw for brainstorming and visual collaboration |
+| **In-Room Chat** | Real-time messaging system for team communication |
+| **File Management** | Create, rename, delete, and organize files and directories |
+| **Syntax Highlighting** | Beautiful code editing with CodeMirror and multiple theme support |
+| **User Presence** | See who's online, cursor positions, and typing indicators |
+| **Responsive Design** | Works seamlessly on desktop and tablet devices |
+| **Dark Theme** | Beautiful dark UI designed for extended coding sessions |
 
 ---
 
@@ -71,7 +91,7 @@ A powerful, real-time collaborative coding platform built for pair programming, 
 | ![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express) | Web Framework |
 | ![Socket.IO](https://img.shields.io/badge/Socket.IO-4.7-010101) | WebSocket Server |
 | ![TypeScript](https://img.shields.io/badge/TypeScript-4.9-3178C6?logo=typescript) | Type Safety |
-| ![Judge0](https://img.shields.io/badge/Judge0-1.13-00ADD8?logo=) | Code Execution |
+| ![Judge0](https://img.shields.io/badge/Judge0-1.13-00ADD8) | Code Execution |
 
 ---
 
@@ -115,6 +135,7 @@ code-Syncer/
 │   ├── package.json
 │   └── tsconfig.json
 │
+├── demo.html                  # Interactive demo page
 ├── docker-compose.yml         # Docker setup with Judge0
 ├── judge0.conf                # Judge0 configuration
 ├── package.json               # Root package.json
@@ -230,7 +251,7 @@ This starts:
 
 ## Supported Languages
 
-Code Sync supports code execution for **20+ programming languages**:
+Code Sync supports code execution for **25+ programming languages**:
 
 | Language | Version | Aliases |
 |----------|---------|---------|

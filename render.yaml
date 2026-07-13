@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: code-sync-server
+    runtime: node
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: JUDGE0_URL
+        value: https://ce.judge0.com

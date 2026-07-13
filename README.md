@@ -12,42 +12,24 @@
 
 A powerful, real-time collaborative coding platform built for pair programming, code reviews, and team collaboration. Join any room with a unique Room ID and see changes instantly synced across all participants.
 
-[Live Demo](https://code-syncer.vercel.app) | [Interactive Demo Page](demo.html) | [Report Bug](https://github.com/harshitGuptaj/code-Syncer/issues)
-
 </div>
 
 ---
 
-## Live Demonstration
+## Live Demo
 
-> **Try it now:** [https://code-syncer.vercel.app](https://code-syncer.vercel.app)
+> **Open the app:** [https://code-syncer.vercel.app](https://code-syncer.vercel.app)
 
-### Watch the Demo
+### Steps to Try
 
-[![Code Sync Demo](https://img.shields.io/badge/Watch-Interactive%20Demo-E94560?style=for-the-badge&logo=github)](demo.html)
+1. Visit [code-syncer.vercel.app](https://code-syncer.vercel.app)
+2. Enter your **username**
+3. Click **"Generate Unique Room Id"**
+4. Click **"Join"**
+5. Create files, edit code, chat, draw — all in real-time
+6. Share the **Room ID** with friends to collaborate together
 
-### How to Use the Demo
-
-**Step 1: Open the App**
-- Visit [https://code-syncer.vercel.app](https://code-syncer.vercel.app)
-
-**Step 2: Create a Room**
-- Enter your name (e.g., "Alice")
-- Click **"Generate Unique Room Id"** or enter a custom Room ID
-- Click **"Join"**
-
-**Step 3: Share the Room**
-- Copy the Room ID from the URL
-- Share it with your collaborators
-- They can join using the same Room ID
-
-**Step 4: Start Collaborating**
-- Edit code in real-time
-- Use the sidebar for file management
-- Chat with your team
-- Draw on the whiteboard
-- Execute code in 25+ languages
-- Get AI-powered code suggestions
+> Open the same Room ID in **two browser tabs** to see real-time syncing in action.
 
 ---
 
@@ -61,7 +43,7 @@ A powerful, real-time collaborative coding platform built for pair programming, 
 | **Collaborative Drawing** | Built-in whiteboard with tldraw for brainstorming and visual collaboration |
 | **In-Room Chat** | Real-time messaging system for team communication |
 | **File Management** | Create, rename, delete, and organize files and directories |
-| **Syntax Highlighting** | Beautiful code editing with CodeMirror and multiple theme support |
+| **Syntax Highlighting** | Beautiful code editing with CodeMirror and 40+ theme support |
 | **User Presence** | See who's online, cursor positions, and typing indicators |
 | **Responsive Design** | Works seamlessly on desktop and tablet devices |
 | **Dark Theme** | Beautiful dark UI designed for extended coding sessions |
@@ -135,98 +117,69 @@ code-Syncer/
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── demo.html                  # Interactive demo page
+├── render.yaml                # Render backend deployment config
 ├── docker-compose.yml         # Docker setup with Judge0
-├── judge0.conf                # Judge0 configuration
 ├── package.json               # Root package.json
 └── README.md
 ```
 
 ---
 
-## Getting Started
+## Run Locally
 
 ### Prerequisites
 
 - **Node.js** >= 18.x
-- **npm** or **yarn**
-- **Docker** (optional, for Judge0 code execution service)
+- **npm**
 
-### Installation
-
-**1. Clone the repository**
+### Quick Setup
 
 ```bash
+# Clone the repo
 git clone https://github.com/harshitGuptaj/code-Syncer.git
 cd code-Syncer
-```
 
-**2. Install dependencies**
-
-```bash
-# Install client dependencies
-cd client
-npm install
-
-# Install server dependencies
-cd ../server
-npm install
-```
-
-**3. Set up environment variables**
-
-```bash
-# Client
-cd client
-cp .env.example .env
-
-# Server
-cd ../server
-cp .env.example .env
-```
-
-**4. Configure API keys** (Optional - for AI Copilot)
-
-Edit `client/.env` and add your Groq API key:
-
-```
-VITE_GROQ_API_KEY=your_groq_api_key_here
-```
-
-> Get your free API key at [console.groq.com](https://console.groq.com)
-
-### Running Locally
-
-**Start the server:**
-
-```bash
+# Install and start the server
 cd server
+npm install
 npm run dev
-```
 
-**Start the client (in a new terminal):**
-
-```bash
+# In a new terminal — install and start the client
 cd client
+npm install
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`
+The app will be available at **http://localhost:5173**
 
-### Running with Docker
+---
 
-For the full experience with code execution support:
+## Deploy Your Own
 
-```bash
-docker-compose up --build
-```
+### Deploy Backend on Render (Free)
 
-This starts:
-- Client at `http://localhost:5173`
-- Server at `http://localhost:3000`
-- Judge0 code execution at `http://localhost:2358`
-- PostgreSQL database
-- Redis cache
+1. Create a free account at [render.com](https://render.com)
+2. Click **"New Web Service"**
+3. Connect your GitHub repo: `harshitGuptaj/code-Syncer`
+4. Configure:
+   - **Root Directory:** `server`
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm start`
+5. Add environment variable:
+   - `JUDGE0_URL` = `https://ce.judge0.com`
+6. Click **Create Web Service**
+7. Copy the URL (e.g., `https://code-sync-server.onrender.com`)
+
+### Deploy Frontend on Vercel
+
+1. Create a free account at [vercel.com](https://vercel.com)
+2. Click **"New Project"** and import `harshitGuptaj/code-Syncer`
+3. Configure:
+   - **Root Directory:** `client`
+   - **Framework Preset:** Vite
+4. Add environment variable:
+   - `VITE_BACKEND_URL` = your Render backend URL (e.g., `https://code-sync-server.onrender.com`)
+5. Click **Deploy**
 
 ---
 
@@ -237,21 +190,17 @@ This starts:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `VITE_BACKEND_URL` | Backend server URL | `http://localhost:3000` |
-| `VITE_PISTON_API_URL` | Piston API URL for code execution | `https://emkc.org/api/v2/piston` |
-| `VITE_GROQ_API_KEY` | Groq API key for AI Copilot | `your_groq_api_key_here` |
 
 ### Server (`server/.env`)
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | Server port | `3000` |
-| `JUDGE0_URL` | Judge0 API URL | `https://ce.judge0.com` |
+| `JUDGE0_URL` | Judge0 API URL for code execution | `https://ce.judge0.com` |
 
 ---
 
 ## Supported Languages
-
-Code Sync supports code execution for **25+ programming languages**:
 
 | Language | Version | Aliases |
 |----------|---------|---------|
@@ -288,20 +237,13 @@ Code Sync supports code execution for **25+ programming languages**:
 │              │◄──────────────────►│              │
 │    Client    │     HTTP/REST      │    Server    │
 │   (React)    │◄──────────────────►│  (Express)   │
-│              │                    │              │
+│   (Vercel)   │                    │  (Render)    │
 └──────┬───────┘                    └──────┬───────┘
-       │                                    │
        │                                    │
        ▼                                    ▼
 ┌──────────────┐                    ┌──────────────┐
 │  CodeMirror  │                    │   Judge0     │
 │    Editor    │                    │   Service    │
-└──────────────┘                    └──────────────┘
-       │                                    │
-       ▼                                    ▼
-┌──────────────┐                    ┌──────────────┐
-│  tldraw      │                    │  PostgreSQL  │
-│  Drawing     │                    │  Database    │
 └──────────────┘                    └──────────────┘
 ```
 
@@ -335,8 +277,6 @@ Code Sync supports code execution for **25+ programming languages**:
 
 ## Contributing
 
-Contributions are welcome! Here's how to get started:
-
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
 3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
@@ -347,22 +287,13 @@ Contributions are welcome! Here's how to get started:
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Acknowledgments
-
-- [CodeMirror](https://codemirror.net/) - Code editor component
-- [Socket.IO](https://socket.io/) - Real-time communication
-- [tldraw](https://www.tldraw.com/) - Drawing and whiteboard
-- [Judge0](https://judge0.com/) - Code execution engine
-- [Groq](https://groq.com/) - AI/LLM inference API
-- [Vercel](https://vercel.com/) - Deployment platform
+This project is licensed under the **MIT License**.
 
 ---
 
 <div align="center">
+
+### [Try Code Sync Live](https://code-syncer.vercel.app)
 
 **Made with care by [Harshit Gupta](https://github.com/harshitGuptaj)**
 

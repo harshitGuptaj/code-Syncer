@@ -1,6 +1,5 @@
 import axiosInstance from "@/api/pistonApi"
 import { Language, RunContext as RunContextType } from "@/types/run"
-import langMap from "lang-map"
 import {
     ReactNode,
     createContext,
@@ -54,21 +53,30 @@ const RunCodeContextProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (!supportedLanguages?.length || !activeFile?.name) return
 
-        const extension = activeFile.name.split(".").pop()
+        const extension = activeFile.name.split(".").pop()?.toLowerCase()
         if (extension) {
-            const languageName = langMap.languages(extension)
-            const language = supportedLanguages.find(
-                (lang: Language) =>
-                    lang.aliases?.includes(extension) ||
-                    languageName.includes(lang.language.toLowerCase()),
-            )
-            if (language) setSelectedLanguage(language)
+            const extToLang: Record<string, string> = {
+                js: "javascript", ts: "typescript", py: "python", java: "java",
+                c: "c", cpp: "cpp", go: "go", rs: "rust", rb: "ruby", php: "php",
+                swift: "swift", kt: "kotlin", html: "html", css: "css", json: "json",
+                md: "markdown", sql: "sql", xml: "xml", yaml: "yaml", sh: "bash",
+                r: "r", pl: "perl", hs: "haskell", lua: "lua", scala: "scala",
+                ex: "elixir", erl: "erlang", clj: "clojure", dart: "dart",
+                groovy: "groovy", cs: "csharp", m: "objectivec"
+            }
+            const langName = extToLang[extension]
+            if (langName) {
+                const language = supportedLanguages.find(
+                    (l: Language) => l.language.toLowerCase() === langName
+                )
+                if (language) setSelectedLanguage(language)
+            }
         } else setSelectedLanguage({ language: "", version: "", aliases: [] })
     }, [activeFile?.name, supportedLanguages])
 
     const runCode = async () => {
         try {
-            if (!selectedLanguage) {
+            if (!selectedLanguage || !selectedLanguage.language) {
                 return toast.error("Please select a language to run the code")
             } else if (!activeFile) {
                 return toast.error("Please open a file to run the code")
@@ -77,12 +85,11 @@ const RunCodeContextProvider = ({ children }: { children: ReactNode }) => {
             }
 
             setIsRunning(true)
-            const { language, version } = selectedLanguage
+            const { language } = selectedLanguage
 
             const response = await axiosInstance.post("/execute", {
                 language,
-                version,
-                files: [{ name: activeFile.name, content: activeFile.content }],
+                code: activeFile.content,
                 stdin: input,
             })
             if (response.data.run.stderr) {

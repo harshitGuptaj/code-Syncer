@@ -20,6 +20,48 @@ import { useEffect, useMemo, useState, useRef, useCallback } from "react"
 import toast from "react-hot-toast"
 import { collaborativeHighlighting, updateRemoteUsers } from "./collaborativeHighlighting"
 
+const normalizeLanguageName = (lang: string): string => {
+    const langMap: Record<string, string> = {
+        javascript: "javascript",
+        typescript: "typescript",
+        python: "python",
+        java: "java",
+        c: "c",
+        cpp: "cpp",
+        go: "go",
+        rust: "rust",
+        ruby: "ruby",
+        php: "php",
+        html: "html",
+        css: "css",
+        json: "json",
+        markdown: "markdown",
+        sql: "sql",
+        xml: "xml",
+        yaml: "yaml",
+        shell: "shell",
+        bash: "bash",
+        sh: "shell",
+        r: "r",
+        perl: "perl",
+        haskell: "haskell",
+        lua: "lua",
+        scala: "scala",
+        erlang: "erlang",
+        clojure: "clojure",
+        dart: "dart",
+        groovy: "groovy",
+        csharp: "csharp",
+        objectivec: "objectiveC",
+        swift: "swift",
+        kotlin: "kotlin",
+        elixir: "elixir",
+        dockerfile: "dockerfile",
+    }
+    const normalized = lang.toLowerCase().trim()
+    return langMap[normalized] || normalized
+}
+
 function Editor() {
     const { users, currentUser } = useAppContext()
     const { activeFile, setActiveFile } = useFileSystem()
@@ -112,7 +154,8 @@ function Editor() {
             EditorView.updateListener.of(handleSelectionChange),
             scrollPastEnd(),
         ]
-        const langExt = loadLanguage(language.toLowerCase() as LanguageName)
+        const normalizedLang = normalizeLanguageName(language)
+        const langExt = loadLanguage(normalizedLang as LanguageName)
         if (langExt) {
             extensions.push(langExt)
         } else {

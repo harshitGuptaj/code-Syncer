@@ -1,0 +1,79 @@
+services:
+  server:
+    image: judge0/judge0:1.13.0
+    container_name: code-sync-judge0
+    restart: always
+    privileged: true
+    ports:
+      - "2358:2358"
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    env_file:
+      - judge0.conf
+
+  worker:
+    image: judge0/judge0:1.13.0
+    container_name: code-sync-worker
+    restart: always
+    privileged: true
+    command: ["./scripts/workers"]
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    env_file:
+      - judge0.conf
+
+  db:
+    image: postgres:16.2
+    container_name: code-sync-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - judge0.conf
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.2.4
+    container_name: code-sync-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["bash", "-c", "docker-entrypoint.sh --appendonly no --requirepass \"$REDIS_PASSWORD\""]
+    env_file:
+      - judge0.conf
+
+  server-app:
+    container_name: code-sync-server
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - JUDGE0_URL=https://ce.judge0.com
+    depends_on:
+      - server
+
+  client:
+    container_name: code-sync-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server-app
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3000
+
+volumes:
+  postgres_data:

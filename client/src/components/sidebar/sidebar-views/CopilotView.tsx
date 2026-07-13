@@ -82,64 +82,68 @@ function CopilotView() {
                 {isRunning ? "Generating..." : "Generate Code"}
             </button>
             {output && (
-                <div className="flex justify-end gap-4 pt-2">
-                    <button title="Copy Output" onClick={copyOutput}>
-                        <LuCopy
-                            size={18}
-                            className="cursor-pointer text-white"
-                        />
-                    </button>
-                    <button
-                        title="Replace code in file"
-                        onClick={replaceCodeInFile}
-                    >
-                        <LuRepeat
-                            size={18}
-                            className="cursor-pointer text-white"
-                        />
-                    </button>
-                    <button
-                        title="Paste code in file"
-                        onClick={pasteCodeInFile}
-                    >
-                        <LuClipboardPaste
-                            size={18}
-                            className="cursor-pointer text-white"
-                        />
-                    </button>
+                <div className="relative flex h-[calc(100%-180px)] flex-col rounded-lg border border-gray-700 bg-[#282a36]">
+                    <div className="absolute right-2 top-2 z-10 flex gap-2">
+                        <button
+                            title="Copy Output"
+                            onClick={copyOutput}
+                            className="rounded bg-gray-700 p-1.5 transition-colors hover:bg-gray-600"
+                        >
+                            <LuCopy size={16} className="text-white" />
+                        </button>
+                        <button
+                            title="Replace code in file"
+                            onClick={replaceCodeInFile}
+                            className="rounded bg-gray-700 p-1.5 transition-colors hover:bg-gray-600"
+                        >
+                            <LuRepeat size={16} className="text-white" />
+                        </button>
+                        <button
+                            title="Paste code in file"
+                            onClick={pasteCodeInFile}
+                            className="rounded bg-gray-700 p-1.5 transition-colors hover:bg-gray-600"
+                        >
+                            <LuClipboardPaste size={16} className="text-white" />
+                        </button>
+                    </div>
+                    <div className="h-full overflow-y-auto p-0">
+                        <ReactMarkdown
+                            components={{
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                code({ inline, className, children, ...props }: any) {
+                                    const match = /language-(\w+)/.exec(className || "")
+                                    const language = match ? match[1] : "javascript"
+
+                                    return !inline ? (
+                                        <SyntaxHighlighter
+                                            style={dracula}
+                                            language={language}
+                                            PreTag="pre"
+                                            className="!m-0 !h-full !rounded-lg !bg-transparent !p-2"
+                                        >
+                                            {String(children).replace(/\n$/, "")}
+                                        </SyntaxHighlighter>
+                                    ) : (
+                                        <code className={className} {...props}>
+                                            {children}
+                                        </code>
+                                    )
+                                },
+                                pre({ children }) {
+                                    return <pre className="h-full">{children}</pre>
+                                },
+                            }}
+                        >
+                            {output}
+                        </ReactMarkdown>
+                    </div>
                 </div>
             )}
-            <div className="h-full rounded-lg w-full overflow-y-auto p-0">
-                <ReactMarkdown
-                    components={{
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        code({ inline, className, children, ...props }: any) {
-                            const match = /language-(\w+)/.exec(className || "")
-                            const language = match ? match[1] : "javascript" // Default to JS
-
-                            return !inline ? (
-                                <SyntaxHighlighter
-                                    style={dracula}
-                                    language={language}
-                                    PreTag="pre"
-                                    className="!m-0 !h-full !rounded-lg !bg-gray-900 !p-2"
-                                >
-                                    {String(children).replace(/\n$/, "")}
-                                </SyntaxHighlighter>
-                            ) : (
-                                <code className={className} {...props}>
-                                    {children}
-                                </code>
-                            )
-                        },
-                        pre({ children }) {
-                            return <pre className="h-full">{children}</pre>
-                        },
-                    }}
-                >
-                    {output}
-                </ReactMarkdown>
-            </div>
+            {!output && (
+                <div className="flex h-[calc(100%-180px)] items-center justify-center rounded-lg border border-gray-700 bg-[#282a36]">
+                    <p className="text-gray-400">Generated code will appear here</p>
+                </div>
+            )}
         </div>
     )
 }

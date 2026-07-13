@@ -1,6 +1,10 @@
-====================================
-  CODE SYNC - PROJECT EXPLANATION
-====================================
+================================================================================
+                    CODE SYNC - VIVA Q&A QUESTIONS
+================================================================================
+
+================================================================================
+  ORIGINAL PROJECT DOCUMENTATION - PLEASE READ FIRST
+================================================================================
 
 WHAT IS CODE SYNC?
 ------------------
@@ -34,7 +38,7 @@ USER FLOW
 
 
 ACTIVE PROJECT STRUCTURE
-------------------------
+---------------------
 Code-Sync-main/
 ├── client/                  → Frontend (React App)
 │   ├── src/
@@ -60,7 +64,7 @@ Code-Sync-main/
 
 
 ACTIVE FEATURES
----------------
+--------------
 1. REAL-TIME CODE EDITING
    - Uses CodeMirror as the code editor
    - Code changes sync instantly via Socket.io
@@ -84,10 +88,9 @@ ACTIVE FEATURES
    - Change editor theme, font, language
 
 
-========================================================================
+================================================================================
   DETAILED CODE EXPLANATION - WHAT EACH FILE DOES
-========================================================================
-
+================================================================================
 
 ---------- ENTRY POINT ----------
 
@@ -163,63 +166,6 @@ HOW IT WORKS:
   - Uses responsive classes (bottom bar on mobile, left bar on desktop)
 CONNECTS TO: SidebarButton.tsx, ViewContext
 
-FILE: client/src/components/sidebar/sidebar-views/SidebarButton.tsx
-WHAT IT DOES: Individual sidebar icon button
-HOW IT WORKS:
-  - Receives a view name and icon as props
-  - On click: opens/closes the corresponding sidebar view
-  - Shows a tooltip on hover with the view name
-CONNECTS TO: ViewContext
-
-FILE: client/src/components/SplitterComponent.tsx
-WHAT IT DOES: Creates a resizable split pane
-HOW IT WORKS:
-  - Uses react-split library
-  - Splits the screen between Sidebar (left) and Workspace (right)
-  - User can drag the divider to resize
-CONNECTS TO: Sidebar.tsx, WorkSpace/index.tsx
-
-
----------- SIDEBAR VIEWS ----------
-
-FILE: client/src/components/sidebar/sidebar-views/FilesView.tsx
-WHAT IT DOES: File explorer panel
-HOW IT WORKS:
-  - Shows tree view of all files and folders
-  - Right-click context menu for create/rename/delete
-  - Click a file to open it in the editor
-  - "Download All" button to save as ZIP
-  - Syncs file operations to all users via socket
-CONNECTS TO: FileContext, SocketContext
-
-FILE: client/src/components/sidebar/sidebar-views/RunView.tsx
-WHAT IT DOES: Code execution panel
-HOW IT WORKS:
-  - Shows "Run" button to execute current code
-  - Has input field for program input (stdin)
-  - Shows output/errors in output area
-  - Uses Piston API to execute code on server
-CONNECTS TO: RunCodeContext, pistonApi.ts
-
-FILE: client/src/components/sidebar/sidebar-views/UsersView.tsx
-WHAT IT DOES: Shows list of users in the room
-HOW IT WORKS:
-  - Displays avatar and username for each user
-  - Shows online (green) or offline (gray) status
-  - Updates in real-time when users join/leave
-CONNECTS TO: AppContext (users list)
-
-FILE: client/src/components/sidebar/sidebar-views/SettingsView.tsx
-WHAT IT DOES: Editor settings panel
-HOW IT WORKS:
-  - Dropdown to change font family
-  - Dropdown to change font size (12-24)
-  - Dropdown to change color theme
-  - Dropdown to change programming language
-  - "Reset to default" button
-  - Settings save to localStorage
-CONNECTS TO: SettingContext
-
 
 ---------- CONTEXT (GLOBAL STATE) ----------
 
@@ -276,136 +222,6 @@ HOW IT WORKS:
   - resetSettings() restores all defaults
 CONNECTS TO: SettingsView.tsx, localStorage
 
-FILE: client/src/context/ViewContext.tsx
-WHAT IT DOES: Controls which sidebar view is active
-WHAT IT STORES:
-  - activeView      → currently selected view (FILES, RUN, etc.)
-  - isSidebarOpen   → whether sidebar panel is visible
-  - viewComponents  → maps view names to React components
-  - viewIcons       → maps view names to icons
-CONNECTS TO: Sidebar.tsx, SidebarButton.tsx
-
-FILE: client/src/context/RunCodeContext.tsx
-WHAT IT DOES: Manages code execution state
-WHAT IT STORES:
-  - input    → user input for the program (stdin)
-  - output   → execution output/result
-  - isRunning → whether code is currently executing
-HOW IT WORKS:
-  - Sends code + language to Piston API
-  - Receives output and displays in RunView
-CONNECTS TO: RunView.tsx, pistonApi.ts
-
-
----------- HOOKS ----------
-
-FILE: client/src/hooks/useLocalStorage.tsx
-WHAT IT DOES: Helper to read/write localStorage
-PROVIDES: getItem(key), setItem(key, value), removeItem(key)
-
-FILE: client/src/hooks/useResponsive.tsx
-WHAT IT DOES: Calculates dynamic heights for responsive layout
-PROVIDES: viewHeight, minHeightReached
-
-FILE: client/src/hooks/useWindowDimensions.tsx
-WHAT IT DOES: Tracks browser window width and height
-PROVIDES: width, height, isMobile (true if width < 768)
-
-FILE: client/src/hooks/useFullScreen.tsx
-WHAT IT DOES: Enables fullscreen mode on the editor page
-
-FILE: client/src/hooks/useUserActivity.tsx
-WHAT IT DOES: Detects if user is active or idle
-HOW IT WORKS:
-  - Listens for mouse/keyboard events
-  - Emits USER_ONLINE when user is active
-  - Emits USER_OFFLINE when user is idle
-
-FILE: client/src/hooks/usePageEvents.tsx
-WHAT IT DOES: Handles browser tab close/refresh events
-HOW IT WORKS:
-  - Shows confirmation dialog when user tries to close the page
-
-FILE: client/src/hooks/useContextMenu.tsx
-WHAT IT DOES: Custom right-click context menu for file explorer
-
-
----------- APIS ----------
-
-FILE: client/src/api/pistonApi.ts
-WHAT IT DOES: Calls the Piston API to execute code
-HOW IT WORKS:
-  - Sends POST request with code, language, and version
-  - Piston API runs the code on their server
-  - Returns stdout (output) and stderr (errors)
-  - API URL: https://emkc.org/api/v2/piston/execute
-
-FILE: client/src/api/pollinationsApi.ts
-WHAT IT DOES: Calls Pollinations AI for code generation (currently disabled)
-
-
----------- UTILS ----------
-
-FILE: client/src/utils/file.ts
-WHAT IT DOES: Helper functions for file operations
-PROVIDES: getId() for generating unique IDs, file tree helpers
-
-FILE: client/src/utils/getIconClassName.ts
-WHAT IT DOES: Maps file extensions to VS Code-style file icons
-
-FILE: client/src/utils/formateDate.ts
-WHAT IT DOES: Formats timestamps for chat messages
-
-FILE: client/src/utils/customMapping.ts
-WHAT IT DOES: Custom file extension to language mappings
-
-
----------- RESOURCES ----------
-
-FILE: client/src/resources/Themes.ts
-WHAT IT DOES: Lists all available editor color themes
-INCLUDES: Dracula, GitHub Dark/Light, Material, Nord, etc.
-
-FILE: client/src/resources/Fonts.ts
-WHAT IT DOES: Lists all available editor fonts
-INCLUDES: Space Mono, Fira Code, JetBrains Mono, etc.
-
-
----------- TYPES ----------
-
-FILE: client/src/types/app.ts
-WHAT IT DOES: TypeScript types for app state (ACTIVITY_STATE, DrawingData)
-
-FILE: client/src/types/user.ts
-WHAT IT DOES: TypeScript types for User, RemoteUser, USER_STATUS
-
-FILE: client/src/types/socket.ts
-WHAT IT DOES: TypeScript types for socket events (SocketEvent enum)
-
-FILE: client/src/types/view.ts
-WHAT IT DOES: TypeScript types for sidebar views (VIEWS enum)
-
-FILE: client/src/types/file.ts
-WHAT IT DOES: TypeScript types for file/folder structure
-
-FILE: client/src/types/chat.ts
-WHAT IT DOES: TypeScript types for chat messages (currently disabled)
-
-FILE: client/src/types/copilot.ts
-WHAT IT DOES: TypeScript types for AI copilot (currently disabled)
-
-
----------- STYLES ----------
-
-FILE: client/src/styles/global.css
-WHAT IT DOES: Global CSS styles for the entire app
-INCLUDES:
-  - Tailwind CSS directives (@tailwind base, components, utilities)
-  - Custom scrollbar styling
-  - CodeMirror editor styling
-  - Bounce animation for illustration
-  - Mobile responsive styles
-
 
 ---------- SERVER ----------
 
@@ -425,30 +241,25 @@ HOW IT WORKS:
   - JOIN_REQUEST        → Validates username, adds user to room
   - disconnecting       → Removes user, notifies others
   - FILE_CREATED        → Broadcasts new file to room
-  - FILE_UPDATED        → Broadcasts code changes to room
-  - FILE_RENAMED        → Broadcasts file rename to room
-  - FILE_DELETED        → Broadcasts file deletion to room
-  - DIRECTORY_CREATED   → Broadcasts new folder to room
-  - DIRECTORY_UPDATED   → Broadcasts folder changes to room
-  - DIRECTORY_RENAMED   → Broadcasts folder rename to room
-  - DIRECTORY_DELETED   → Broadcasts folder deletion to room
-  - SEND_MESSAGE        → Broadcasts chat message to room
-  - TYPING_START        → Broadcasts typing status with cursor position
-  - TYPING_PAUSE        → Broadcasts typing stopped
-  - CURSOR_MOVE         → Broadcasts cursor position change
-  - USER_ONLINE         → Broadcasts user came back online
-  - USER_OFFLINE        → Broadcasts user went offline
-  - REQUEST_DRAWING     → Requests drawing data from other users
-  - SYNC_DRAWING        → Sends drawing data to requesting user
-  - DRAWING_UPDATE      → Broadcasts drawing changes to room
+  - FILE_UPDATED       → Broadcasts code changes to room
+  - FILE_RENAMED       → Broadcasts file rename to room
+  - FILE_DELETED       → Broadcasts file deletion to room
+  - DIRECTORY_CREATED → Broadcasts new folder to room
+  - DIRECTORY_UPDATED  → Broadcasts folder changes to room
+  - DIRECTORY_RENAMED  → Broadcasts folder rename to room
+  - DIRECTORY_DELETED → Broadcasts folder deletion to room
+  - SEND_MESSAGE       → Broadcasts chat message to room
+  - TYPING_START     → Broadcasts typing status with cursor position
+  - TYPING_PAUSE    → Broadcasts typing stopped
+  - CURSOR_MOVE     → Broadcasts cursor position change
+  - USER_ONLINE      → Broadcasts user came back online
+  - USER_OFFLINE    → Broadcasts user went offline
 
 CONNECTS TO: All frontend socket events via Socket.io
 
 
-========================================================================
-  HOW TO RUN
-========================================================================
-
+HOW TO RUN
+----------
 1. Open terminal in "server" folder:
    npm install
    npm run dev
@@ -465,3 +276,395 @@ TECH STACK
 Frontend:  React, TypeScript, Tailwind CSS, CodeMirror
 Backend:   Node.js, Express, Socket.io
 APIs:      Piston (code execution)
+
+
+================================================================================
+  VIVA QUESTIONS & ANSWERS
+================================================================================
+
+SECTION 1: BASIC QUESTIONS
+--------------------------
+
+Q1: How do users join a room in Code Sync?
+A1: Users enter a Room ID and Username on the home page and click "Join".
+    The server validates the username (must be unique in that room) and
+    adds the user to the room using Socket.io.
+
+
+Q2: What is Socket.io and why is it used?
+A2: Socket.io is a WebSocket library that enables real-time bidirectional
+    communication. It handles:
+    - Real-time code syncing between users
+    - Connection management
+    - Fallback to HTTP long-polling if WebSocket fails
+    - Event-based communication (join, type, cursor move, etc.)
+
+
+Q3: How is real-time code syncing implemented?
+A3: When a user types in the code editor:
+    1. CodeMirror emits a 'change' event
+    2. The client emits 'file-updated' socket event to server
+    3. Server broadcasts to all other users in the room
+    4. Other clients receive and update their editors
+
+
+Q4: How do you handle multiple users working on the same file?
+A4: Each user has their own file state. When User A types, their changes are
+    broadcast immediately. Other users see the changes as they happen.
+
+
+================================================================================
+SECTION 2: KEY CONCEPT - MULTIPLE USERS ON SAME LINE
+================================================================================
+
+Q5: What happens when two or more users work on the SAME CODE at the SAME LINE?
+
+A5: This is a CRITICAL question for collaborative editing. Here's how it works:
+
+    MECHANISM:
+    - When User A types at line 5, their full document content is sent to server
+    - Server broadcasts to all users in the room
+    - Each user's editor is updated with the new content
+    
+    WHAT HAPPENS:
+    - The user who types FIRST - their changes are preserved
+    - The user who types SECOND - their changes will be OVERWRITTEN by the broadcast
+    - Last write wins - whoever types last gets their changes shown
+    
+    LIMITATION:
+    - There is NO operational transformation (OT) or CRDT implementation
+    - This is a KNOWN LIMITATION of the current implementation
+    - In production, you would use OT (Operational Transformation) or CRDT 
+      (Conflict-free Replicated Data Type) to handle conflicts
+    
+    CURRENT BEHAVIOR:
+    - User A types: "function hello() {"
+    - User B types: "function world() {"
+    - Whichever message arrives last at the server wins
+    - Both users will see the same final content
+
+
+Q6: How do you handle cursor position sync for multiple users?
+A6: The server tracks each user's cursor position:
+    - When user starts typing: emits TYPING_START with cursorPosition
+    - When user moves cursor: emits CURSOR_MOVE event
+    - Server broadcasts to all users in the room
+    - Clients render colored cursors showing other users' positions
+
+
+Q7: What is the difference between TYPING_START and CURSOR_MOVE events?
+A7:
+    - TYPING_START: User is actively typing (shows green typing indicator)
+    - CURSOR_MOVE: User just moved cursor without typing (no typing indicator)
+
+
+================================================================================
+SECTION 3: ARCHITECTURE QUESTIONS
+================================================================================
+
+Q8: Explain the architecture of Code Sync.
+
+A8: 
+    CLIENT (React + TypeScript)
+           │
+           │ WebSocket (Socket.io)
+           ▼
+    SERVER (Node.js + Express)
+           │
+           │ HTTP + WebSocket
+           ▼
+    EXTERNAL APIS (Piston for code execution)
+
+
+Q9: How is the state managed in the frontend?
+A9: React Context API is used for global state management:
+    - AppContext: users list, current user, connection status
+    - SocketContext: WebSocket connection
+    - FileContext: file/folder structure
+    - SettingContext: theme, font, language preferences
+    - ViewContext: active sidebar view
+    - RunCodeContext: code execution state
+
+
+Q10: What is CodeMirror and why is it used?
+A10: CodeMirror is a JavaScript code editor library that provides:
+     - Syntax highlighting for 100+ languages
+     - Multiple color themes
+     - Line numbers
+     - Code folding
+     - Search and replace
+     - Custom keybindings
+     - Easy integration with React
+
+
+Q11: How is code execution handled?
+A11:
+    1. User clicks "Run" button in RunView
+    2. Client sends code + language to /api/execute endpoint
+    3. Server forwards to Piston API
+    4. Piston executes code in isolated container
+    5. Results (stdout/stderr) returned to client
+    6. Displayed in RunView output panel
+
+
+================================================================================
+SECTION 4: SERVER-SIDE QUESTIONS
+================================================================================
+
+Q12: What socket events are used in the server?
+A12: The server handles these main events:
+    - JOIN_REQUEST: User wants to join a room
+    - FILE_CREATED, FILE_UPDATED, FILE_RENAMED, FILE_DELETED
+    - DIRECTORY_CREATED, DIRECTORY_UPDATED, DIRECTORY_RENAMED, DIRECTORY_DELETED
+    - TYPING_START, TYPING_PAUSE, CURSOR_MOVE
+    - USER_ONLINE, USER_OFFLINE
+    - SEND_MESSAGE, RECEIVE_MESSAGE (chat)
+    - REQUEST_DRAWING, SYNC_DRAWING, DRAWING_UPDATE (whiteboard)
+
+
+Q13: How does the server track users?
+A13: The server maintains a userSocketMap array:
+    interface User {
+        username: string
+        roomId: string
+        status: "online" | "offline"
+        cursorPosition: number
+        typing: boolean
+        socketId: string
+        currentFile: string | null
+    }
+
+
+Q14: What happens when a user disconnects?
+A14: On disconnect:
+    - Server removes user from userSocketMap
+    - Notifies all users in the room via USER_DISCONNECTED event
+    - User is removed from the room (socket.leave)
+
+
+================================================================================
+SECTION 5: FILE MANAGEMENT
+================================================================================
+
+Q15: How is the file system managed?
+A15:
+    - FileContext maintains a fileStructure tree
+    - Each file/folder has unique ID, name, parentId
+    - Operations (create/rename/delete) emit socket events
+    - Server broadcasts to all users in room
+    - All users see same file tree
+
+
+Q16: Can users download the project files?
+A16: Yes, FilesView has "Download All" button that:
+    - Creates a ZIP file of all files
+    - Triggers browser download
+    - User gets entire codebase locally
+
+
+================================================================================
+SECTION 6: ADVANCED QUESTIONS
+================================================================================
+
+Q17: What are the limitations of the current implementation?
+A17:
+    1. No conflict resolution (last write wins)
+    2. No operational transformation (OT)
+    3. No CRDT implementation
+    4. No user authentication
+    5. No room password protection
+    6. Code execution depends on external API (Piston/Judge0)
+
+
+Q18: How would you improve conflict handling for concurrent editing?
+A18: Two main approaches:
+    
+    A) Operational Transformation (OT):
+       - Transform operations so they can be applied in any order
+       - Used by Google Docs, Etherpad
+       - Requires central server to manage transform history
+       
+    B) CRDT (Conflict-free Replicated Data Type):
+       - Data structure that automatically resolves conflicts
+       - Yjs library provides CRDT for text editing
+       - Can work in peer-to-peer mode
+       - More complex but more robust
+
+
+Q19: What security measures are implemented?
+A19:
+    - CORS enabled but set to "*" (should be restricted in production)
+    - No authentication system
+    - No input sanitization for code execution
+    - Room IDs are not password protected
+    
+    RECOMMENDATIONS FOR PRODUCTION:
+    - Add user authentication (JWT)
+    - Implement rate limiting
+    - Restrict CORS to specific domains
+    - Sanitize inputs
+    - Add room password protection
+
+
+Q20: How does the drawing/whiteboard feature work?
+A20:
+    - Canvas-based drawing
+    - User clicks "Draw" to enable drawing mode
+    - Drawing data synced via DRAWING_UPDATE events
+    - Other users see drawings in real-time
+
+
+================================================================================
+SECTION 7: TECHNICAL IMPLEMENTATION
+================================================================================
+
+Q21: What is the difference between Express and Socket.io ports?
+A21:
+    - Express server: Port 3000 (or defined in .env)
+    - Serves static files, API endpoints (/api/runtimes, /api/execute)
+    - Socket.io: Runs on same server, shares port 3000
+    - Uses WebSocket protocol for real-time communication
+
+
+Q22: How is the server configured?
+A22: Using dotenv package:
+    - .env file stores environment variables
+    - PORT: server port (default 3000)
+    - JUDGE0_URL: code execution API endpoint
+    - VITE_BACKEND_URL: frontend backend connection
+
+
+Q23: What programming languages are supported for code execution?
+A23: 25 languages including:
+    JavaScript, TypeScript, Python, Java, C, C++, Go, Rust,
+    Ruby, PHP, Swift, Kotlin, Bash, R, Perl, Haskell,
+    Lua, Scala, Elixir, Erlang, Clojure, Dart, Groovy, C#
+
+
+Q24: How do you switch between programming languages?
+A24:
+    - SettingsView has language dropdown
+    - Changes saved to SettingContext
+    - CodeMirror reinitializes with new language mode
+    - Affects syntax highlighting
+
+
+================================================================================
+SECTION 8: YOUR SPECIFIC IMPLEMENTATION
+================================================================================
+
+Q25: What was the hardest part of building this project?
+A25: (Replace with your actual experience)
+    - Real-time syncing without conflicts
+    - File tree management
+    - CodeMirror integration with React
+    - Handling WebSocket disconnections
+
+
+Q26: What did you learn from building this project?
+A26: (Replace with your actual learning)
+    - WebSocket/Socket.io communication
+    - React Context for state management
+    - Real-time application architecture
+    - Code execution APIs
+
+
+Q27: How would you extend this project in the future?
+A27: 
+    - Add OT/CRDT for conflict-free editing
+    - Add user authentication
+    - Add chat/video call features
+    - Add syntax checking/IntelliSense
+    - Add Git integration
+    - Add real-time compiler errors
+
+
+================================================================================
+  ANSWERS TO THE KEY QUESTION - WHEN TWO USERS WORK ON SAME LINE
+================================================================================
+
+QUESTION: When two or more users work on the same code at the same line,
+what happens?
+
+DETAILED ANSWER:
+
+In the current implementation of Code Sync:
+
+1. USER TYPE SEQUENCE:
+   - User A starts typing at position 100
+   - User B also starts typing at position 100
+   
+2. SERVER HANDLING:
+   - Server receives both updates via FILE_UPDATED events
+   - No transformation is applied
+   - Last update overwrites previous
+
+3. RESULT:
+   - Whichever user's update reaches the server LAST wins
+   - Both users see the same final code
+   - The first user's changes are LOST
+
+4. EXAMPLE:
+   Timeline:
+   
+   User A: types "abc" ---------> sent to server
+   User B: types "xyz" ----> sent to server (arrives first)
+   
+   Result: Both users see "xyz"
+   User A's "abc" is LOST - overwritten by User B's changes
+
+5. WHY THIS HAPPENS:
+   - We don't use Operational Transformation (OT)
+   - We don't use CRDT (Conflict-free Replicated Data Type)
+   - Simple broadcast - last write wins
+   - No conflict resolution algorithm implemented
+
+6. WHAT USERS SEE:
+   - User types something, but suddenly their code DISAPPEARS
+   - Other user's code overwrites their changes
+   - Cursor might jump to unexpected position
+   - No error message - just unexpected behavior
+
+7. LIMITATION:
+   - This is NOT suitable for production use
+   - For production: use Yjs with CodeMirror or implement OT
+
+8. HOW TO FIX:
+   - Integrate Yjs (CRDT library) with CodeMirror:
+     npm install yjs y-codemirror
+   - Or use operational-transform library
+   - Or implement server-side operation ordering
+
+
+================================================================================
+  SAMPLE VIVA ANSWERS
+================================================================================
+
+STRONG ANSWER FOR CONCURRENT EDITING QUESTION:
+"Our current implementation uses a simple broadcast approach where the last 
+write wins. When two users type at the same position:
+1. Each user's edit is sent to the server as a complete file update
+2. The server broadcasts to all users in the room
+3. The last edit received overwrites previous changes
+
+This is a KNOWN LIMITATION. For production use, I would implement 
+Operational Transformation (OT) using libraries like Yjs or 
+operational-transformation. This is a planned improvement for the project."
+
+
+TECH STACK SUMMARY:
+- React 18 + TypeScript
+- Node.js + Express
+- Socket.io (WebSocket)
+- CodeMirror 6 (editor)
+- Piston API (code execution)
+- Tailwind CSS (styling)
+
+
+RUNNING THE PROJECT:
+1. Terminal 1: cd server && npm run dev
+2. Terminal 2: cd client && npm run dev  
+3. Browser: http://localhost:5173
+
+
+================================================================================

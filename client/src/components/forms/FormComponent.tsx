@@ -91,7 +91,7 @@ const FormComponent = () => {
         <div className="flex w-full max-w-[500px] flex-col items-center justify-center gap-4 p-4 sm:w-[500px] sm:p-0">
             <div className="mb-6 text-center">
                 <h1 className="text-5xl font-bold text-white sm:text-6xl">
-                    Code <span className="text-[#4ade80]">Syncer</span>
+                    Code <span className="text-[#e94560]">Syncer</span>
                 </h1>
                 <p className="mt-2 text-sm text-gray-300">Code, Chat, Collaborate. It's All in Sync.</p>
             </div>
@@ -100,7 +100,7 @@ const FormComponent = () => {
                     type="text"
                     name="roomId"
                     placeholder="ROOM Id"
-                    className="w-full rounded-md border border-gray-600 bg-[#3d404a] px-4 py-3 text-gray-300 placeholder-gray-500 focus:border-primary focus:outline-none"
+                    className="w-full rounded-md border border-[#e94560]/40 bg-[#0f3460]/50 px-4 py-3 text-gray-200 placeholder-gray-400 focus:border-[#e94560] focus:bg-[#0f3460]/70 focus:outline-none transition-all"
                     onChange={handleInputChanges}
                     value={currentUser.roomId}
                 />
@@ -108,20 +108,20 @@ const FormComponent = () => {
                     type="text"
                     name="username"
                     placeholder="USERNAME"
-                    className="w-full rounded-md border border-gray-600 bg-[#3d404a] px-4 py-3 text-gray-300 placeholder-gray-500 focus:border-primary focus:outline-none"
+                    className="w-full rounded-md border border-[#e94560]/40 bg-[#0f3460]/50 px-4 py-3 text-gray-200 placeholder-gray-400 focus:border-[#e94560] focus:bg-[#0f3460]/70 focus:outline-none transition-all"
                     onChange={handleInputChanges}
                     value={currentUser.username}
                     ref={usernameRef}
                 />
                 <button
                     type="submit"
-                    className="mt-2 w-full rounded-md bg-[#4ade80] px-8 py-3 text-lg font-semibold text-black hover:bg-[#3dcc70] transition-colors"
+                    className="mt-2 w-full rounded-md bg-gradient-to-r from-[#e94560] to-[#d63384] px-8 py-3 text-lg font-semibold text-white hover:from-[#d63384] hover:to-[#e94560] transition-all duration-300 shadow-lg shadow-[#e94560]/30"
                 >
                     Join
                 </button>
             </form>
             <button
-                className="cursor-pointer select-none text-sm underline text-gray-300 hover:text-white transition-colors"
+                className="cursor-pointer select-none text-sm text-gray-300 underline hover:text-[#e94560] transition-colors"
                 onClick={createNewRoomId}
             >
                 Generate Unique Room Id

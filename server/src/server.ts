@@ -16,37 +16,124 @@ app.use(express.json())
 
 app.use(cors())
 
-app.use(express.static(path.join(__dirname, "public"))) // Serve static files
+app.use(express.static(path.join(__dirname, "public")))
 
-const PISTON_API_URL = process.env.PISTON_API_URL || "https://emkc.org/api/v2/piston"
+const JUDGE0_URL = process.env.JUDGE0_URL || "http://localhost:2358"
+
+const languageToJudge0Id: Record<string, number> = {
+    javascript: 63,
+    typescript: 101,
+    python: 71,
+    java: 62,
+    c: 50,
+    cpp: 54,
+    go: 60,
+    rust: 73,
+    ruby: 72,
+    php: 68,
+    swift: 78,
+    kotlin: 70,
+    bash: 46,
+    r: 80,
+    perl: 85,
+    haskell: 64,
+    lua: 66,
+    scala: 81,
+    elixir: 56,
+    erlang: 57,
+    clojure: 55,
+    dart: 56,
+    groovy: 61,
+    csharp: 51,
+}
 
 app.get("/api/runtimes", async (req: Request, res: Response) => {
-    try {
-        const response = await axios.get(`${PISTON_API_URL}/runtimes`)
-        res.json(response.data)
-    } catch (error: any) {
-        console.error("Error fetching runtimes:", error.message)
-        res.status(500).json({ error: "Failed to fetch runtimes" })
-    }
+    const runtimes = [
+        { language: "javascript", version: "18.15.0", aliases: ["js", "node"] },
+        { language: "typescript", version: "5.0.3", aliases: ["ts"] },
+        { language: "python", version: "3.10.0", aliases: ["py", "python3"] },
+        { language: "java", version: "15.0.2", aliases: ["java"] },
+        { language: "c", version: "10.2.0", aliases: ["c"] },
+        { language: "cpp", version: "10.2.0", aliases: ["cpp", "c++"] },
+        { language: "go", version: "1.16.2", aliases: ["go"] },
+        { language: "rust", version: "1.68.2", aliases: ["rs", "rust"] },
+        { language: "ruby", version: "3.0.1", aliases: ["rb", "ruby"] },
+        { language: "php", version: "8.1.6", aliases: ["php"] },
+        { language: "swift", version: "5.6.0", aliases: ["swift"] },
+        { language: "kotlin", version: "1.8.0", aliases: ["kt", "kotlin"] },
+        { language: "bash", version: "5.2.0", aliases: ["sh", "bash"] },
+        { language: "r", version: "4.1.1", aliases: ["r"] },
+        { language: "perl", version: "5.34.0", aliases: ["pl", "perl"] },
+        { language: "haskell", version: "9.0.1", aliases: ["hs", "haskell"] },
+        { language: "lua", version: "5.4.4", aliases: ["lua"] },
+        { language: "scala", version: "3.2.0", aliases: ["scala"] },
+        { language: "elixir", version: "1.14.0", aliases: ["ex", "elixir"] },
+        { language: "erlang", version: "25.1", aliases: ["erl", "erlang"] },
+        { language: "clojure", version: "1.11.1", aliases: ["clj", "clojure"] },
+        { language: "dart", version: "2.19.6", aliases: ["dart"] },
+        { language: "groovy", version: "4.0.3", aliases: ["groovy"] },
+        { language: "csharp", version: "6.12.0", aliases: ["cs", "c#"] },
+    ]
+    res.json(runtimes)
 })
 
 app.post("/api/execute", async (req: Request, res: Response) => {
     try {
-        const { language, version, files, stdin } = req.body
-        console.log("Executing code:", { language, version, files: files?.length, stdin })
-        const response = await axios.post(`${PISTON_API_URL}/execute`, {
-            language,
-            version,
-            files,
-            stdin,
+        const { language, code, stdin } = req.body
+        console.log("Executing code:", { language, code: code.substring(0, 50) })
+        
+        const languageId = languageToJudge0Id[language]
+        
+        if (!languageId) {
+            res.status(400).json({ error: `Unsupported language: ${language}` })
+            return
+        }
+
+        const submitResponse = await axios.post(`${JUDGE0_URL}/submissions?base64_encoded=true&wait=false`, {
+            language_id: languageId,
+            source_code: Buffer.from(code).toString('base64'),
+            stdin: stdin ? Buffer.from(stdin).toString('base64') : null,
         })
-        res.json(response.data)
+
+        const token = submitResponse.data.token
+        console.log("Submission token:", token)
+
+        let result = null
+        for (let i = 0; i < 60; i++) {
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            const statusResponse = await axios.get(`${JUDGE0_URL}/submissions/${token}?base64_encoded=true`)
+            result = statusResponse.data
+            console.log(`Attempt ${i+1}: Status ${result.status?.id} - ${result.status?.description}`)
+            
+            if (result.status?.id > 2) break
+        }
+
+        if (!result) {
+            res.status(500).json({ error: "Execution timed out" })
+            return
+        }
+
+        const stdout = result.stdout ? Buffer.from(result.stdout, 'base64').toString() : ""
+        const stderr = result.stderr ? Buffer.from(result.stderr, 'base64').toString() : ""
+
+        console.log("Execution complete:", { status: result.status?.id, stdout: stdout.substring(0, 100) })
+        
+        console.log("Execution complete:", { status: result.status?.id, stdout: stdout.substring(0, 100) })
+
+        res.json({
+            run: {
+                stdout,
+                stderr,
+                code: result.status?.id === 3 ? 0 : result.status?.id || 1,
+                signal: result.signal || null
+            }
+        })
     } catch (error: any) {
         console.error("Error executing code:", error.message)
-        console.error("Full error:", error)
-        console.error("Piston API response:", error.response?.data)
-        console.error("Piston API status:", error.response?.status)
-        res.status(500).json({ error: "Failed to execute code", details: error.response?.data })
+        res.status(500).json({ 
+            error: "Code execution service is currently unavailable",
+            details: error.response?.data || error.message
+        })
     }
 })
 

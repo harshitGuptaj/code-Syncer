@@ -16,6 +16,8 @@ app.use(express.json())
 
 app.use(cors())
 
+const clientBuildPath = path.join(__dirname, "..", "..", "client", "dist")
+app.use(express.static(clientBuildPath))
 app.use(express.static(path.join(__dirname, "public")))
 
 const JUDGE0_URL = process.env.JUDGE0_URL || "http://localhost:2358"
@@ -407,9 +409,8 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 3000
 
-app.get("/", (req: Request, res: Response) => {
-	// Send the index.html file
-	res.sendFile(path.join(__dirname, "..", "public", "index.html"))
+app.get("/{*splat}", (req: Request, res: Response) => {
+	res.sendFile(path.join(clientBuildPath, "index.html"))
 })
 
 server.listen(Number(PORT), () => {

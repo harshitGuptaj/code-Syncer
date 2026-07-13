@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios"
 
-const pistonBaseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
+const pistonBaseUrl = import.meta.env.VITE_BACKEND_URL || window.location.origin
 
 const instance: AxiosInstance = axios.create({
     baseURL: pistonBaseUrl + "/api",
